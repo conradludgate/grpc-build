@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package grpc_build.messages.builtin;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+
+message CustomMessage {
+  google.protobuf.Timestamp timestamp = 8;
+  google.protobuf.StringValue string_value = 5;
+}

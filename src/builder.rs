@@ -1,10 +1,12 @@
-use std::{ffi::OsString, path::Path};
+use std::{ffi::OsString, path::Path, collections::HashSet};
 
 /// A mirror of [`tonic_build::Builder`] for our own control
 pub struct Builder {
     pub(crate) tonic: tonic_build::Builder,
     pub(crate) prost: prost_build::Config,
     pub(crate) protoc_args: Vec<OsString>,
+    pub(crate) extern_paths: HashSet<String>,
+    pub(crate) prost_types: bool,
 }
 
 impl Default for Builder {
@@ -13,6 +15,8 @@ impl Default for Builder {
             tonic: tonic_build::configure(),
             prost: Default::default(),
             protoc_args: Default::default(),
+            extern_paths: Default::default(),
+            prost_types: true,
         }
     }
 }
@@ -44,6 +48,7 @@ impl Builder {
             proto_path.as_ref().to_string(),
             rust_path.as_ref().to_string(),
         );
+        self.extern_paths.insert(proto_path.as_ref().to_string());
         self
     }
 
@@ -108,10 +113,9 @@ impl Builder {
     /// of using the already-compiled versions available in the `prost-types` crate.
     ///
     /// This defaults to `false`.
-    pub fn compile_well_known_types(mut self, compile_well_known_types: bool) -> Self {
-        if compile_well_known_types {
-            self.prost.compile_well_known_types();
-        };
+    pub fn compile_well_known_types(mut self) -> Self {
+        self.prost.compile_well_known_types();
+        self.prost_types = false;
         self
     }
 
